@@ -1,0 +1,205 @@
+<!doctype html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Socketio Test </title>
+</head>
+
+<body> 
+
+  <!-- Bootstrap + jquery --> 
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">     
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">     
+
+  <!-- Vue -->
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://cdn.jsdelivr.net/vee-validate/2.0.0-rc.3/vee-validate.min.js"></script>
+
+  <!-- Socketio -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+
+  <div class="container" id="app">
+
+    <div class="row">
+      <div class="col-md-10">
+        <h1> Serial Bridge: Colorimeter Test Client  </h1> 
+      </div>
+      <div class="col-md-2">
+        <h1> <small> IO Rodeo </small> </h1>
+      </div>
+    </div>
+
+    <div class="panel panel-primary"> 
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a> 
+            Serial Ports
+          </a>
+        </h4>
+      </div>
+      <div class="panel-body"> 
+        <div class="row">
+          <div class="col-md-12">
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th> # </th>
+                  <th> Device </th>
+                  <th> Name </th>
+                  <th> VID </th>
+                  <th> PID </th>
+                  <th> Product </th>
+                  <th> Manufacturer </th>
+                  <th> Description </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in portArray"> 
+                  <td> [[index]] </td>
+                  <td> [[item.device]] </td>
+                  <td> [[item.name]] </td>
+                  <td> [[item.vid]] </td>
+                  <td> [[item.pid]] </td>
+                  <td> [[item.product]] </td>
+                  <td> [[item.manufacturer]] </td>
+                  <td> [[item.description]] </td>
+                </tr>
+              </tbody>
+            </table>
+          </div> 
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel panel-primary"> 
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a> 
+            Connection
+          </a>
+        </h4>
+      </div>
+      <div class="panel-body"> 
+        <div class="row">
+
+          <div class="col-md-12">
+            <form v-on:submit.prevent class="form-inline">
+              <div class="form-group">
+                <label style="padding-right:7px;"> Serial Port:  </label>
+                <select v-model="portName" class="form-control" :disabled="portOpen ? true : false">
+                  <option v-for="item in portArray"> [[item.device]] </option>
+                </select>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <!-- <button v-on:click="onOpenCloseButton" :disabled="portName==null ? true : false" > -->
+                <button v-on:click="onOpenCloseButton" :class="portName==null ? 'btn btn-default disabled' : 'btn btn-default active'" > 
+                  [[portOpen ? "Close" : "Open"]]
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label style="padding-left:10px"> Baudrate: [[portParam.baudrate]] </label>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary"> 
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a> 
+            Test Controls
+          </a>
+        </h4>
+      </div>
+      <div class="panel-body"> 
+        <div class="row">
+          <div class="col-md-10">
+            <form v-on:submit.prevent class="form-inline">
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onZeroButton" :class="portOpen ? 'btn btn-default active' : 'btn btn-default disabled'" > 
+                  Zero
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onMeasureAllButton" :class="zeroed ? 'btn btn-default active' : 'btn btn-default disabled'" > 
+                  Measure All
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onMeasureRedButton" :class="zeroed ? 'btn btn-default active' : 'btn btn-default disabled'" > 
+                  Measure Red 
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:10px;">
+                <button v-on:click="onMeasureGreenButton" :class="zeroed ? 'btn btn-default active' : 'btn btn-default disabled'"> 
+                  Measure Green 
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onMeasureBlueButton" :class="zeroed ? 'btn btn-default active' : 'btn btn-default disabled'" > 
+                  Measure Blue 
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onMeasureWhiteButton" :class="zeroed ? 'btn btn-default active' : 'btn btn-default disabled'" > 
+                  Measure White 
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-2">
+            [[message]]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary"> 
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a> 
+            Results
+          </a>
+        </h4>
+      </div>
+      <div class="panel-body"> 
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th> LED </th>
+                  <th> frequency (Hz) </th>
+                  <th> transmission </th>
+                  <th> absorbance </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(value,key) in result.data">
+                  <td> [[key]] </td>
+                  <td> [[value.freq]] </td>
+                  <td> [[value.tran.toFixed(3)]] </td>
+                  <td> [[value.abso.toFixed(3)]] </td>
+                </tr>
+              </tbody>
+            </table>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <p v-if="result.error"> [[result.errorMsg]]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="text/javascript" src="bundle.js"> </script>
+
+</body>

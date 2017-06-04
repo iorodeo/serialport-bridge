@@ -1,0 +1,13 @@
+{
+  "name": "serialport-bridge",
+  "version": "0.0.1",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.15.2",
+    "serialport": "^4.0.7",
+    "socket.io": "^2.0.1"
+  },
+  "devDependencies": {
+    "browserify-middleware": "^7.1.0"
+  }
+}

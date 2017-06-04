@@ -1,0 +1,2 @@
+export FLASK_APP=test_app.py
+export FLASK_DEBUG=1

@@ -25,7 +25,8 @@ var app = new Vue({
     setupListPortsTimer: function() {
       setInterval( () => {
         console.log('listPorts');
-        this.socket.emit('listPorts',{noInfo: true});
+        //this.socket.emit('listPorts',{noInfo: true});
+        this.socket.emit('listPorts');
       }, this.listPortsDt);
     },
 

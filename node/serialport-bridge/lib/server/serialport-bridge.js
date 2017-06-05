@@ -58,9 +58,10 @@ class SerialPortBridge {
         rsp = {success: false, error: e}; 
       }
       socket.emit('listPortsRsp', rsp);
-      if (!msg || !msg.noInfo) {
-        io.emit('info', {listPorts: {rsp: rsp}}); 
-      }
+      //console.log(msg)
+      //if (!msg || !msg.noInfo) {
+      //  io.emit('info', {listPorts: {rsp: rsp}}); 
+      //}
     });
   }
 

@@ -20,10 +20,10 @@
   <div class="container" id="app">
 
     <div class="row">
-      <div class="col-md-10">
+      <div class="col-sm-10">
         <h1> Serial Bridge: Colorimeter Test Client  </h1> 
       </div>
-      <div class="col-md-2">
+      <div class="col-sm-2">
         <h1> <small> IO Rodeo </small> </h1>
       </div>
     </div>
@@ -38,22 +38,23 @@
       </div>
       <div class="panel-body"> 
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-sm-12">
 
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th> # </th>
-                  <th> Device </th>
-                  <th> Name </th>
-                  <th> VID </th>
-                  <th> PID </th>
-                  <th> Product </th>
-                  <th> Manufacturer </th>
-                  <th> Description </th>
-                </tr>
-              </thead>
-              <tbody>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th> # </th>
+                    <th> Device </th>
+                    <th> Name </th>
+                    <th> VID </th>
+                    <th> PID </th>
+                    <th> Product </th>
+                    <th> Manufacturer </th>
+                    <th> Description </th>
+                  </tr>
+                </thead>
+                <tbody>
                 <tr v-for="(item, index) in portArray"> 
                   <td> [[index]] </td>
                   <td> [[item.device]] </td>
@@ -64,8 +65,9 @@
                   <td> [[item.manufacturer]] </td>
                   <td> [[item.description]] </td>
                 </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div> 
         </div>
       </div>
@@ -83,7 +85,7 @@
       <div class="panel-body"> 
         <div class="row">
 
-          <div class="col-md-12">
+          <div class="col-sm-12">
             <form v-on:submit.prevent class="form-inline">
               <div class="form-group">
                 <label style="padding-right:7px;"> Serial Port:  </label>
@@ -118,7 +120,7 @@
       </div>
       <div class="panel-body"> 
         <div class="row">
-          <div class="col-md-10">
+          <div class="col-sm-10">
             <form v-on:submit.prevent class="form-inline">
               <div class="form-group" style="padding-left:10px">
                 <button v-on:click="onZeroButton" :class="portOpen ? 'btn btn-default active' : 'btn btn-default disabled'" > 
@@ -152,7 +154,7 @@
               </div>
             </form>
           </div>
-          <div class="col-md-2">
+          <div class="col-sm-2">
             [[message]]
           </div>
         </div>
@@ -169,29 +171,31 @@
       </div>
       <div class="panel-body"> 
         <div class="row">
-          <div class="col-md-12">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th> LED </th>
-                  <th> frequency (Hz) </th>
-                  <th> transmission </th>
-                  <th> absorbance </th>
-                </tr>
-              </thead>
-              <tbody>
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th> LED </th>
+                    <th> frequency (Hz) </th>
+                    <th> transmission </th>
+                    <th> absorbance </th>
+                  </tr>
+                </thead>
+                <tbody>
                 <tr v-for="(value,key) in result.data">
                   <td> [[key]] </td>
                   <td> [[value.freq]] </td>
                   <td> [[value.tran.toFixed(3)]] </td>
                   <td> [[value.abso.toFixed(3)]] </td>
                 </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div> 
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-sm-12">
             <p v-if="result.error"> [[result.errorMsg]]</p>
           </div>
         </div>

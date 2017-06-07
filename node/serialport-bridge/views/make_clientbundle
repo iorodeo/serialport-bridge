@@ -1,0 +1,2 @@
+browserify ../lib/client/client.js -o clientbundle.js
+

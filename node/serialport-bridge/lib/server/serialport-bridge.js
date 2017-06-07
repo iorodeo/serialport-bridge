@@ -5,7 +5,14 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 let SerialPort = require('serialport');
-let browserify = require('browserify-middleware');
+
+const DEVELOPMENT = true;
+if (DEVELOPMENT) { 
+  // Note, pkg can't compile browserify so don't include 
+  // when creating the application bundle.
+  var browserify = require('browserify-middleware');
+}
+
 
 const SOCKETIO_PORT = 5000;
 
@@ -35,6 +42,9 @@ class SerialPortBridge {
 
   run() {
     app.use(express.static('views'));
+    if (DEVELOPMENT) { 
+      app.get('/clientbundle.js', browserify(__dirname + '/../client/client.js'));
+    }
     app.get('/clientbundle.js', browserify(__dirname + '/../client/client.js'));
     app.get('/', function(req,res) {
       res.sendFile('index.html');

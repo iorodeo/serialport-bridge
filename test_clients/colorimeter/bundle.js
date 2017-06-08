@@ -9,7 +9,9 @@ var app = new Vue({
   delimiters: ['[[', ']]'],
 
   data: {
-    serialBridge: new SerialBridge('http://localhost:5000'),
+    connected: false,
+    serverAddress: 'http://localhost:5000',
+    serialBridge: null,
     listPortsTimer: null,
     listPortsTimerDt: 2000,
     message: "",
@@ -29,6 +31,19 @@ var app = new Vue({
   },
 
   methods: {
+
+    onBridgeConnectButton: function() {
+      console.log(this.serverAddress);
+      if (this.connected) {
+        this.serialBridge.disconnect();
+      } else {
+        console.log("onBridgeConnectButton");
+        this.serialBridge = new SerialBridge(this.serverAddress);
+        this.serialBridge.connect();
+        this.setupSerialBridge();
+      }
+    },
+
     onOpenCloseButton: function() {
       console.log('onOpenCloseButton');
       if (this.portOpen) {
@@ -84,6 +99,18 @@ var app = new Vue({
 
     stopListPortsTimer: function() {
       clearInterval(this.listPortsTimer);
+    },
+
+    onSerialBridgeConnect: function() {
+      this.connected = true;
+      this.startListPortsTimer();
+    },
+
+    onSerialBridgeDisconnect: function() {
+      this.connected = false;
+      this.stopListPortsTimer();
+      this.portArray = [];
+      this.portName = null;
     },
 
     onSerialBridgeListPortsRsp: function(rsp) { 
@@ -193,6 +220,7 @@ var app = new Vue({
           break;
 
         default:
+          break;
       }
     },
 
@@ -201,13 +229,15 @@ var app = new Vue({
       this.serialBridge.on('openRsp', this.onSerialBridgeOpenRsp); 
       this.serialBridge.on('closeRsp', this.onSerialBridgeCloseRsp);
       this.serialBridge.on('readLineRsp', this.onSerialBridgeReadLineRsp);
+      this.serialBridge.on('connect', this.onSerialBridgeConnect);
+      this.serialBridge.on('disconnect', this.onSerialBridgeDisconnect);
     },
 
   },
 
   mounted: function() {
-    this.setupSerialBridge();
-    this.startListPortsTimer();
+    //this.setupSerialBridge();
+    //this.startListPortsTimer();
   },
 
 });
@@ -218,38 +248,49 @@ var app = new Vue({
 
 class SerialBridge {
 
-    constructor(url) {
-        this.socket = io.connect(url);
-    }
+  constructor(url) {
+    this.url = url;
+    this.socket = null;
+  }
 
-    listPorts() {
-        console.log('listPorts');
-        this.socket.emit('listPorts');
-    }
+  connect() {
+    this.socket = io.connect(this.url);
+  }
 
-    open(port,options) {
-        this.socket.emit('open', {port: port, options: options});
-    }
+  disconnect() {
+    this.socket.close();
+    this.socket = null;
+  }
 
-    close() {
-        this.socket.emit('close');
-    }
 
-    readLine() {
-        this.socket.emit('readLine');
-    }
+  listPorts() {
+    console.log('listPorts');
+    this.socket.emit('listPorts');
+  }
 
-    writeLine(tag,line) {
-        this.socket.emit('writeLine',{tag: tag, line: line});
-    }
+  open(port,options) {
+    this.socket.emit('open', {port: port, options: options});
+  }
 
-    writeReadLine(tag,line) {
-        this.socket.emit('writeReadLine', {tag: tag, line: line});
-    }
+  close() {
+    this.socket.emit('close');
+  }
 
-    on(eventName, callback) {
-        this.socket.on(eventName,callback);
-    }
+  readLine() {
+    this.socket.emit('readLine');
+  }
+
+  writeLine(tag,line) {
+    this.socket.emit('writeLine',{tag: tag, line: line});
+  }
+
+  writeReadLine(tag,line) {
+    this.socket.emit('writeReadLine', {tag: tag, line: line});
+  }
+
+  on(eventName, callback) {
+    this.socket.on(eventName,callback);
+  }
 }
 
 module.exports = SerialBridge;

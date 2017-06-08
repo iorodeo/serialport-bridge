@@ -7,9 +7,10 @@ let io = require('socket.io')(server);
 let SerialPort = require('serialport');
 
 const DEVELOPMENT = true;
+
+// Note, pkg can't compile browserify for some reason - maybe a path issue. So
+// don't include when creating the application bundle.
 if (DEVELOPMENT) { 
-  // Note, pkg can't compile browserify so don't include 
-  // when creating the application bundle.
   var browserify = require('browserify-middleware');
 }
 
@@ -35,9 +36,11 @@ class SerialPortBridge {
       this.setupSocketClearBusyCb(socket);
       this.setupSocketDisconnectCb(socket);
       io.emit('clients', this.clients); 
+      if (this.serialPort) {
+        // Send open response ... to indicate that port is open, etc
+      }
       console.log(this.clients);
     });
-
   }
 
   run() {
@@ -45,7 +48,6 @@ class SerialPortBridge {
     if (DEVELOPMENT) { 
       app.get('/clientbundle.js', browserify(__dirname + '/../client/client.js'));
     }
-    app.get('/clientbundle.js', browserify(__dirname + '/../client/client.js'));
     app.get('/', function(req,res) {
       res.sendFile('index.html');
     });
@@ -68,10 +70,6 @@ class SerialPortBridge {
         rsp = {success: false, error: e}; 
       }
       socket.emit('listPortsRsp', rsp);
-      //console.log(msg)
-      //if (!msg || !msg.noInfo) {
-      //  io.emit('info', {listPorts: {rsp: rsp}}); 
-      //}
     });
   }
 
@@ -160,6 +158,7 @@ class SerialPortBridge {
     socket.on('disconnect', () => {
       console.log('disconnect');
       delete this.clients[socket.id];
+      io.emit('clients', this.clients); 
     });
   }
 

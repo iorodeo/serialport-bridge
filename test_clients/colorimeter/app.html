@@ -21,19 +21,50 @@
 
     <div class="row">
       <div class="col-sm-10">
-        <h1> Serial Bridge: Colorimeter Test Client  </h1> 
+        <h1> Colorimeter Test  </h1> 
       </div>
       <div class="col-sm-2">
         <h1> <small> IO Rodeo </small> </h1>
       </div>
     </div>
 
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a> Serial Port Bridge </a>
+        </h4>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+
+          <div class="col-sm-12">
+            <form v-on:submit.prevent class="form-inline">
+              <div class="form-group" style="padding-left:10px">
+                <label style="padding-right:7px;"> Connected: [[connected]] </label>
+              </div>
+              <div class="form-group" style="padding-left:10px">
+                <button v-on:click="onBridgeConnectButton" class="btn btn-default-active" > 
+                  [[connected ? "Disconnect" : "Connect"]]
+                </button>
+              </div>
+              <div class="form-group" style="padding-left:50px">
+                <label style="padding-right:7px;"> Server Address </label>
+              </div>
+              <div class="form-group" style="padding-left:0px">
+                <div class="input-group">
+                  <input type="text" class="form-control" aria-label="This" v-model="serverAddress">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel panel-primary"> 
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a> 
-            Serial Ports
-          </a>
+          <a> Port List</a>
         </h4>
       </div>
       <div class="panel-body"> 
@@ -77,9 +108,7 @@
     <div class="panel panel-primary"> 
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a> 
-            Connection
-          </a>
+          <a> Port Connection </a>
         </h4>
       </div>
       <div class="panel-body"> 
@@ -113,9 +142,7 @@
     <div class="panel panel-primary"> 
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a> 
-            Test Controls
-          </a>
+          <a> Test Controls </a>
         </h4>
       </div>
       <div class="panel-body"> 
@@ -164,9 +191,7 @@
     <div class="panel panel-primary"> 
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a> 
-            Results
-          </a>
+          <a> Results </a>
         </h4>
       </div>
       <div class="panel-body"> 

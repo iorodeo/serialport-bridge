@@ -119,6 +119,7 @@
               <div class="form-group">
                 <label style="padding-right:7px;"> Serial Port:  </label>
                 <select v-model="portName" class="form-control" :disabled="portOpen ? true : false">
+                  <option disabled value=""> Please Select One </option>
                   <option v-for="item in portArray"> [[item.device]] </option>
                 </select>
               </div>
@@ -128,9 +129,11 @@
                   [[portOpen ? "Close" : "Open"]]
                 </button>
               </div>
-
               <div class="form-group">
                 <label style="padding-left:10px"> Baudrate: [[portParam.baudrate]] </label>
+              </div>
+              <div class="form-group">
+                <label style="padding-left:10px"> portName: [[portName]] </label>
               </div>
             </form>
           </div>

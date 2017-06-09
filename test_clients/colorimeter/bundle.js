@@ -50,7 +50,6 @@ var app = new Vue({
         this.serialBridge.close();
       }
       else {
-        this.stopListPortsTimer();
         this.serialBridge.open(this.portName,this.portParam);
       }
     },
@@ -103,6 +102,7 @@ var app = new Vue({
 
     onSerialBridgeConnect: function() {
       this.connected = true;
+      this.serialBridge.listPorts();
       this.startListPortsTimer();
     },
 
@@ -120,6 +120,12 @@ var app = new Vue({
 
     onSerialBridgeOpenRsp: function(rsp) {
       console.log(JSON.stringify(rsp));
+      this.stopListPortsTimer();
+      this.portArray = rsp.ports;
+      this.portName = rsp.serialPortInfo.portName;
+      this.portParam.baudrate = rsp.serialPortInfo.baudRate; 
+      console.log(this.portName);
+      console.log(this.portArray);
       setTimeout(() => { 
         this.portOpen = rsp.success;
       }, 2000);

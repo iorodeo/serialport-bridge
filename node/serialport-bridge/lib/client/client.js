@@ -1,5 +1,7 @@
 "use strict"; 
 
+const STATUS_UNCONNECTED = {connected: false, portName: '---'};
+
 var app = new Vue({
 
   el: '#app',
@@ -11,13 +13,7 @@ var app = new Vue({
     messages: [],
     maxMessages: 25,
     clients: [],
-    connectionStatus: {
-      connected: false,
-      port: '--',
-      baudRate: '--',
-      writeCount: 0,
-      readCount: 0,
-    },
+    connectionStatus: STATUS_UNCONNECTED, 
   },
 
   methods: {
@@ -25,7 +21,6 @@ var app = new Vue({
     setupListPortsTimer: function() {
       setInterval( () => {
         console.log('listPorts');
-        //this.socket.emit('listPorts',{noInfo: true});
         this.socket.emit('listPorts');
       }, this.listPortsDt);
     },
@@ -44,6 +39,16 @@ var app = new Vue({
             this.messages.pop();
           }
           console.log(data);
+        });
+
+        socket.on('openRsp', (data) => {
+          this.connectionStatus = {connected: true};
+          Object.assign(this.connectionStatus,data.serialPortInfo);
+        });
+
+        socket.on('closeRsp', (data) => {
+          this.connectionStatus = STATUS_UNCONNECTED;
+
         });
 
         socket.on('clients', (data) => {

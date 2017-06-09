@@ -22,6 +22,11 @@ class SerialPortBridge {
   constructor() {
 
     this.serialPort = null;
+    this.serialPortInfo = {};
+
+    this.portsListCur = [];
+    this.portsListErr = '';
+      
     this.dataTag = null;
     this.busy = false;
     this.clients = {};
@@ -37,9 +42,13 @@ class SerialPortBridge {
       this.setupSocketDisconnectCb(socket);
       io.emit('clients', this.clients); 
       if (this.serialPort) {
-        // Send open response ... to indicate that port is open, etc
+        io.emit('openRsp', {
+          success: true, 
+          serialPortInfo: this.serialPortInfo, 
+          ports: this.getSimplifiedPortsList()
+        });
       }
-      console.log(this.clients);
+      //console.log(this.clients);
     });
   }
 
@@ -60,17 +69,25 @@ class SerialPortBridge {
   setupSocketOnListPortsCb(socket) {
     socket.on('listPorts', async (msg) => {
       console.log('on listPorts');
-      let ports = [];
-      let rsp = [];
-      let err = null;
       try {
-        ports = await this.listSerialPorts();
-        rsp = {success: true, ports: this.processPortsList(ports)};
+        this.portsListCur = await this.listSerialPorts();
+        this.portsListErr = '';
       } catch (e) {
-        rsp = {success: false, error: e}; 
+        this.portsListCur = [];
+        this.portsListErr = e;
       }
-      socket.emit('listPortsRsp', rsp);
+      this.sendPortsListCur(socket);
     });
+  }
+
+  sendPortsListCur(socket) {
+    let rsp = [];
+    if (this.portsListErr) {
+      rsp = {success: false, error: this.portsListErr};
+    } else {
+      rsp = {success: true, ports: this.getSimplifiedPortsList()};
+    }
+    socket.emit('listPortsRsp', rsp);
   }
 
   setupSocketOnOpenCb(socket) {
@@ -81,8 +98,15 @@ class SerialPortBridge {
         baudRate: msg.options.baudrate,
       }
 
+      this.serialPortInfo = {portName: msg.port};
+      Object.assign(this.serialPortInfo, options);
+
       this.serialPort = new SerialPort(msg.port, options, (err) => {
-        let rsp = err ? {success: false} : {success: true};
+        let rsp = {
+          success: !err, 
+          serialPortInfo: this.serialPortInfo,
+          ports: this.getSimplifiedPortsList()
+        };
         io.emit('openRsp', rsp);
         io.emit('info', {open: {msg: msg, rsp: rsp}});
       });
@@ -175,18 +199,18 @@ class SerialPortBridge {
     return promise;
   }
 
-  processPortsList(ports) { 
+  getSimplifiedPortsList() { 
     let modPorts = [];
     let ttySCnt = 0;
-    for (let i=0; i<ports.length; i++) { 
-      if (ports[i].comName.indexOf('ttyS') == -1) { 
+    for (let i=0; i<this.portsListCur.length; i++) { 
+      if (this.portsListCur[i].comName.indexOf('ttyS') == -1) { 
         let item = { 
-          device: ports[i].comName, 
-          name: path.basename(ports[i].comName),
-          vid: ports[i].vendorId,
-          pid: ports[i].productId,
-          manufacturer: ports[i].manufacturer,
-          serialNumber: ports[i].serialNumber.split('_').pop(),
+          device: this.portsListCur[i].comName, 
+          name: path.basename(this.portsListCur[i].comName),
+          vid: this.portsListCur[i].vendorId,
+          pid: this.portsListCur[i].productId,
+          manufacturer: this.portsListCur[i].manufacturer,
+          serialNumber: this.portsListCur[i].serialNumber.split('_').pop(),
         };
         modPorts.push(item);
       } else {

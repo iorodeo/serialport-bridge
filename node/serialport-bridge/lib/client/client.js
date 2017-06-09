@@ -6,6 +6,7 @@ var app = new Vue({
 
   el: '#app',
   delimiters: ['[[', ']]'],
+
   data: {
     socket: null, 
     ports: [],
@@ -14,6 +15,7 @@ var app = new Vue({
     maxMessages: 25,
     clients: [],
     connectionStatus: STATUS_UNCONNECTED, 
+    serverInfo: null,
   },
 
   methods: {
@@ -53,6 +55,10 @@ var app = new Vue({
 
         socket.on('clients', (data) => {
           this.clients = data;
+        });
+
+        socket.on('serverInfo', (data) => {
+          this.serverInfo = data;
         });
 
         socket.on('listPortsRsp', (data) => {

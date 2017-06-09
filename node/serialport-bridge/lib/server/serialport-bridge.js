@@ -5,8 +5,10 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 let SerialPort = require('serialport');
+let ip = require('ip');
 
 const DEVELOPMENT = true;
+const INCLUDE_TTYS = false;
 
 // Note, pkg can't compile browserify for some reason - maybe a path issue. So
 // don't include when creating the application bundle.
@@ -41,6 +43,10 @@ class SerialPortBridge {
       this.setupSocketClearBusyCb(socket);
       this.setupSocketDisconnectCb(socket);
       io.emit('clients', this.clients); 
+      io.emit('serverInfo', {
+        address: ip.address(),
+        port: SOCKETIO_PORT,
+      }); 
       if (this.serialPort) {
         io.emit('openRsp', {
           success: true, 
@@ -48,7 +54,6 @@ class SerialPortBridge {
           ports: this.getSimplifiedPortsList()
         });
       }
-      //console.log(this.clients);
     });
   }
 
@@ -204,24 +209,33 @@ class SerialPortBridge {
     let ttySCnt = 0;
     for (let i=0; i<this.portsListCur.length; i++) { 
       if (this.portsListCur[i].comName.indexOf('ttyS') == -1) { 
+
+        let mixedNumber  = this.portsListCur[i].serialNumber;
+        let manufacturer = this.portsListCur[i].manufacturer;
+        let serialNumber = this.portsListCur[i].serialNumber.split('_').pop();
+        let product = mixedNumber.replace(manufacturer + '_', '').replace('_' + serialNumber, '');
+
         let item = { 
           device: this.portsListCur[i].comName, 
           name: path.basename(this.portsListCur[i].comName),
           vid: this.portsListCur[i].vendorId,
           pid: this.portsListCur[i].productId,
-          manufacturer: this.portsListCur[i].manufacturer,
-          serialNumber: this.portsListCur[i].serialNumber.split('_').pop(),
+          manufacturer: manufacturer, 
+          serialNumber: serialNumber, 
+          product: product,
         };
         modPorts.push(item);
       } else {
         ttySCnt++;
       }
     }
-    let ttySItem = {
-      device: '/dev/ttyS0-S' + ttySCnt,
-      name: 'ttyS0-S' + ttySCnt,
-    };
-    modPorts.push(ttySItem);
+    if (INCLUDE_TTYS) {
+      let ttySItem = {
+        device: '/dev/ttyS0-S' + ttySCnt,
+        name: 'ttyS0-S' + ttySCnt,
+      };
+      modPorts.push(ttySItem);
+    }
     return modPorts;
   }
 

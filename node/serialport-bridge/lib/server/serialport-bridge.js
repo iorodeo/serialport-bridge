@@ -160,7 +160,7 @@ class SerialPortBridge {
 
   setupSocketOnWriteLineCb(socket) {
     socket.on('writeLine', (msg) => {
-      console.log('on writeLing');
+      console.log('on writeLine');
       let rsp = {};
       if (!this.serialPort.isOpen()) {
         rsp = {success: false, error: 'port is not open'};

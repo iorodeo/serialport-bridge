@@ -1,0 +1,194 @@
+<!doctype html>
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> SerialPort-Bridge </title>
+
+</head>
+
+<body> 
+
+  <link rel="stylesheet" href="../node_modules/vuetify/dist/vuetify.min.css">
+  <link rel="stylesheet" href="../node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
+
+  <link rel="stylesheet" href="vuetify.min.css">
+  <link rel="stylesheet" href="css/roboto/roboto-fontface.css">
+
+  <div id="app" >
+    <v-app >
+      <v-container >
+        <v-layout row >
+
+          <v-tabs v-model="activeTab" >
+            <v-tabs-bar class="indigo" dark mt-0>
+              <v-tabs-item v-for="tab in tabs" :key="tab" :href="'#' + tab" ripple>
+                {{capitalize(tab)}}
+              </v-tabs-item>
+              <v-tabs-slider color="pink"> </v-tabs-slider>
+            </v-tabs-bar>
+            <v-tabs-items>
+              <v-tabs-content v-for="tab in tabs" :key="tab" :id="tab">
+
+                <v-container v-if="tab=='Bridge Server'">
+                  <template v-for="(value,key) in serverInfo">
+                    <v-layout row>
+                    <v-flex xs2>
+                      <v-card flat >
+                        <v-card-text> 
+                          <h4> {{capitalize(key)}}:  </h4>
+                        </v-card-text>
+                      </v-card>
+                    </v-flex>
+                    <v-flex>
+                      <v-card flat >
+                        <v-card-text>
+                          {{value}}
+                        </v-card-text>
+                      </v-card>
+                    </v-flex>
+                  </v-layout>
+                  <v-divider color="grey darken-4"> </v-divider>
+                  </template>
+
+                  <v-layout row>
+                    <v-flex>
+                      <v-card flat >
+                        <v-card-title>
+                          <h4> Clients </h4> 
+                        </v-card-title>
+                        <v-card-text>
+                          <template v-for="(value,key,index) in clients">
+                            <v-layout row>
+                              <v-flex xs2>
+                                <v-card flat>
+                                {{index+1}}.)  {{filterLocalhost(value.address)}}
+                                </v-card>
+                              </v-flex>
+                              <v-flex>
+                                <v-card flat>
+                                  {{value.time}}
+                                </v-card>
+                              </v-flex>
+                            </v-layout>
+                          </template>
+                        </v-card-text>
+                      </v-card>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+
+                <v-container v-if="tab === 'Serial Ports'">
+
+                  <v-layout row style="overflow-x:auto">
+                    <v-flex>
+                      <v-card flat>
+                        <v-card-title>
+                          <h4> Available Ports </h4>
+                        </v-card-title>
+                        <v-card-text>
+                          <v-data-table 
+                             v-bind:headers="portAvailableHeaders()" 
+                             v-bind:items="portAvailableItems()"
+                             hide-actions
+                             class="elevation-0"
+                            >
+                            <template slot="items" slot-scope="props">
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-left'"> 
+                                {{props.item.number}} 
+                              </td>
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-right'"> 
+                                {{props.item.device}} 
+                              </td>
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-right'"> 
+                                {{props.item.manufacturer}}
+                              </td>
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-right'"> 
+                                {{props.item.vid}}
+                              </td>
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-right'"> 
+                                {{props.item.pid}}
+                              </td>
+                              <td v-bind:class="portAvailableSpanClass(props.item) + ' ' + 'text-xs-right'"> 
+                                {{props.item.serialNumber}}
+                              </td>
+                            </template>
+                          </v-data-table>
+                        </v-card-text>
+                      </v-card>
+                    <v-flex>
+                  </v-layout>
+
+                  <v-layout row style="overflow-x:auto">
+                    <v-flex>
+                      <v-card flat>
+                        <v-card-title>
+                          <h4> Connection Status </h4> 
+                        </v-card-title>
+                        <v-card-text>
+                          <v-data-table 
+                            v-bind:headers="portStatusHeaders()"
+                            v-bind:items="portStatusItems()"
+                            hide-actions
+                            class="elevation-0" 
+                            >
+                            <template slot="items" slot-scope="props">
+                              <td v-bind:class="portStatusSpanClass() + ' ' + 'text-xs-left'"> 
+                                {{props.item.connected}} 
+                              </td>
+                              <td v-bind:class="portStatusSpanClass() + ' ' + 'text-xs-right'"> 
+                                {{props.item.device}} 
+                              </td>
+                              <td v-bind:class="portStatusSpanClass() + ' ' + 'text-xs-right'"> 
+                                {{props.item.baudrate}} 
+                              </td>
+                            </template>
+                          </v-data-table>
+                        </v-card-text>
+                      </v-card>
+                    </v-flex>
+                  </v-layout>
+
+                </v-container>
+
+                <v-container v-if="tab === 'Messages'">
+                  <v-layout row style="overflow-x:auto">
+                    <v-flex>
+                      <v-card>
+                        <v-card-text>
+                          <v-data-table 
+                            v-bind:items="messageItems()" 
+                            hide-actions 
+                            hide-headers 
+                            class="elevation-0"
+                            >
+                            <template slot="items" slot-scope="props">
+                              <td> 
+                                <span>
+                                  {{props.item.index}}
+                                </span>
+                              </td>
+                              <td>
+                                <span>
+                                  {{props.item.value}}
+                                </span>
+                              </td>
+                            </template>
+                          </v-data-table>
+                        </v-card-text>
+                      </v-card>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+
+              </v-tabs-content>
+            </v-tabs-items>
+          </v-tabs>
+        </v-layout>
+      </v-container>
+    </v-app>
+  </div>
+
+  <script> require('../client_app.js') </script>
+  <script type="text/javascript" src="clientbundle.js"></script>
+
+</body>

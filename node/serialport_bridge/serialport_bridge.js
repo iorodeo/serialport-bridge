@@ -204,24 +204,59 @@ class SerialPortBridge {
     let modPorts = [];
     let ttySCnt = 0;
     for (let i=0; i<this.portsListCur.length; i++) { 
+
       if (this.portsListCur[i].comName.indexOf('ttyS') == -1) { 
 
-        let mixedNumber  = this.portsListCur[i].serialNumber;
+        console.log(JSON.stringify(this.portsListCur[i]));
+        let device = this.portsListCur[i].comName; 
         let manufacturer = this.portsListCur[i].manufacturer;
-        let serialNumber = this.portsListCur[i].serialNumber.split('_').pop();
-        let product = mixedNumber.replace(manufacturer + '_', '').replace('_' + serialNumber, '');
+        let vid = this.portsListCur[i].vendorId;
+        let pid = this.portsListCur[i].productId;
+        let name = '';
+        let serialNumber = '';
+        let product = '';
 
-        let item = { 
-          device: this.portsListCur[i].comName, 
-          name: path.basename(this.portsListCur[i].comName),
-          vid: this.portsListCur[i].vendorId,
-          pid: this.portsListCur[i].productId,
-          manufacturer: manufacturer, 
-          serialNumber: serialNumber, 
-          product: product,
-        };
+        if (this.portsListCur[i].serialNumber) {
+          //  Get info on Linux etc.
+          try {
+            name =  path.basename(this.portsListCur[i].comName);
+          } catch (err) {
+            name = 'err';
+          }
+          try {
+            serialNumber = this.portsListCur[i].serialNumber.split('_').pop();
+          } catch (err) {
+              serialNumber = 'err';
+          }
+          try {
+            product = this.portsListCur[i].serialNumber.replace(manufacturer + '_', '');
+            product = product.replace('_' + serialNumber, '');
+          } catch (err) {
+            product = 'err';
+          }
+        } 
+        else {
+          // Get info on Windows.  
+          try {
+            name = this.portsListCur[i].comName;
+          } catch (err)
+          {
+            name = 'err';
+          }
+          try {
+            let pnpId = this.portsListCur[i].pnpId;
+            pnpId = pnpId.split('\\');
+            serialNumber = pnpId[2];
+          } catch (err) {
+            serialNumber = 'err';
+          }
+        }
+
+        let item = {device, name, vid, pid, manufacturer, serialNumber, product}; 
         modPorts.push(item);
-      } else {
+
+      } 
+      else {
         ttySCnt++;
       }
     }

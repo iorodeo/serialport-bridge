@@ -44,6 +44,14 @@
         "AppImage",
         "deb"
       ]
+    },
+    "win": {
+      "target": [ 
+          "portable",
+          "msi",
+          "squirrel"
+        ],
+      "icon": "build/icon.ico"
     }
   }
 }

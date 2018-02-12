@@ -32,7 +32,6 @@ var app = new Vue({
 
     setupListPortsTimer: function() {
       setInterval( () => {
-        //console.log('listPorts');
         this.socket.emit('listPorts');
       }, this.listPortsDt);
     },
@@ -49,12 +48,9 @@ var app = new Vue({
 
         socket.on('info', (data) => {
           this.messages.unshift(data);
-          //console.log(this.messages.length);
-          //console.log(this.maxMessages)
           if (this.messages.length > this.maxMessages) {
             this.messages.pop();
           }
-          //console.log(data);
         });
 
         socket.on('openRsp', (data) => {
@@ -76,8 +72,6 @@ var app = new Vue({
         });
 
         socket.on('listPortsRsp', (data) => {
-          //console.log('listPortsRsp');
-          //console.log(data);
           if (data.success) {
             this.ports = data.ports;
           } else {
@@ -183,9 +177,7 @@ var app = new Vue({
   },
 
   mounted: function() {
-    console.log('mounted');
     this.setupSocket().then((socket) => {
-      //console.log('socket setup');
       this.socket = socket;
       this.setupListPortsTimer();
     });

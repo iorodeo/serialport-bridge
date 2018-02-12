@@ -12,3 +12,4 @@ __pycache__
 build
 _build
 node_modules
+node/serialport_bridge/dist

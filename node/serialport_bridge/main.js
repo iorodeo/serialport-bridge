@@ -35,12 +35,12 @@ function createWindow () {
         {role: 'quit'}
       ]
     },
-    {
-      label: 'Debug',
-      submenu: [
-        {role: 'toggledevtools'}
-      ]
-    }
+    //{
+    //  label: 'Debug',
+    //  submenu: [
+    //    {role: 'toggledevtools'}
+    //  ]
+    //}
   ]
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)

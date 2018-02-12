@@ -69,7 +69,6 @@ class SerialPortBridge {
 
   setupSocketOnListPortsCb(socket) {
     socket.on('listPorts', async (msg) => {
-      //console.log('on listPorts');
       try {
         this.portsListCur = await this.listSerialPorts();
         this.portsListErr = '';
@@ -93,7 +92,6 @@ class SerialPortBridge {
 
   setupSocketOnOpenCb(socket) {
     socket.on('open', (msg) => {
-      //console.log('on open');
       let options = { 
         parser: SerialPort.parsers.readline('\n'), 
         baudRate: msg.options.baudrate,
@@ -125,7 +123,6 @@ class SerialPortBridge {
 
   setupSocketOnCloseCb(socket) {
     socket.on('close', (msg) => {
-      //console.log('on close');
       this.serialPort.close( (err) => {
         let rsp = err ? {success: false} :{success: true};
         io.emit('closeRsp',rsp);
@@ -137,7 +134,6 @@ class SerialPortBridge {
 
   setupSocketOnWriteReadLineCb(socket) {
     socket.on('writeReadLine', (msg) => {
-      //console.log('on writeReadLine');
       let rsp = {};
       if (!this.serialPort.isOpen()) {
         rsp = {success: false, error: 'port is not open'};
@@ -156,7 +152,6 @@ class SerialPortBridge {
 
   setupSocketOnWriteLineCb(socket) {
     socket.on('writeLine', (msg) => {
-      //console.log('on writeLine');
       let rsp = {};
       if (!this.serialPort.isOpen()) {
         rsp = {success: false, error: 'port is not open'};
@@ -173,7 +168,6 @@ class SerialPortBridge {
 
   setupSocketClearBusyCb(socket) {
     socket.on('clearBusy', (msg) => {
-      //console.log('on clearBusy');
       this.dataTag = null;
       this.busy = false;
     });
@@ -181,7 +175,6 @@ class SerialPortBridge {
 
   setupSocketDisconnectCb(socket) {
     socket.on('disconnect', () => {
-      //console.log('disconnect');
       delete this.clients[socket.id];
       io.emit('clients', this.clients); 
     });
@@ -207,7 +200,6 @@ class SerialPortBridge {
 
       if (this.portsListCur[i].comName.indexOf('ttyS') == -1) { 
 
-        console.log(JSON.stringify(this.portsListCur[i]));
         let device = this.portsListCur[i].comName; 
         let manufacturer = this.portsListCur[i].manufacturer;
         let vid = this.portsListCur[i].vendorId;

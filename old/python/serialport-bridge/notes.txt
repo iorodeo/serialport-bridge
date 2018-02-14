@@ -1,3 +1,0 @@
-This is the first experimental cut at socket.io base serial port bridge.  The
-node version is the more up to date version and this needs to be rewritten to
-make compatible with the node serial bridge.

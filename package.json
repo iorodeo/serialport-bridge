@@ -51,7 +51,7 @@
           "msi",
           "squirrel"
         ],
-      "icon": "build/icon.ico"
+      "icon": "icons/serialport_bridge.ico"
     }
   }
 }

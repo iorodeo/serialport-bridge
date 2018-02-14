@@ -48,10 +48,12 @@
     "win": {
       "target": [ 
           "portable",
-          "msi",
-          "squirrel"
+          "nsis"
         ],
       "icon": "icons/serialport_bridge.ico"
+    },
+    "nsis": {
+        "oneClick": false
     }
   }
 }

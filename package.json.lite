@@ -1,0 +1,19 @@
+{
+  "name": "serialport-bridge",
+  "version": "0.1.0",
+  "description": "Provides a Socket IO based bridge between serial port and browser.",
+  "author": "Will Dickson <will@iorodeo.com>",
+  "license": "MIT",
+  "repository": "https://bitbucket.org/iorodeo/serialport-bridge",
+  "dependencies": {
+    "browserify-middleware": "^8.0.0",
+    "express": "^4.16.2",
+    "ip": "^1.1.5",
+    "lodash": "^4.17.4",
+    "roboto-fontface": "^0.8.0",
+    "serialport": "^4.0.7",
+    "socket.io": "^2.0.4",
+    "vue": "^2.5.13",
+    "vuetify": "^0.17.6"
+  }
+}

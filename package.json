@@ -1,6 +1,6 @@
 {
   "name": "serialport-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Provides a Socket IO based bridge between serial port and browser.",
   "author": "Will Dickson <will@iorodeo.com>",
   "license": "MIT",

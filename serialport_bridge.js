@@ -5,6 +5,8 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const SerialPort = require('serialport');
+const Delimiter = require('@serialport/parser-delimiter')
+
 const ip = require('ip');
 const browserify = require('browserify-middleware');
 const server_config = require('./server_config');
@@ -93,7 +95,7 @@ class SerialPortBridge {
   setupSocketOnOpenCb(socket) {
     socket.on('open', (msg) => {
       let options = { 
-        parser: SerialPort.parsers.readline('\n'), 
+        //parser: SerialPort.parsers.readline('\n'), 
         baudRate: msg.options.baudrate,
       }
 
@@ -110,13 +112,23 @@ class SerialPortBridge {
         io.emit('info', {open: {msg: msg, rsp: rsp}});
       });
 
-      this.serialPort.on('data', (data) =>  {
-        let line = data.trim();
+      const parser = this.serialPort.pipe(new Delimiter({ delimiter: '\n' }));
+
+      parser.on('data', (data) =>  {
+      //this.serialPort.on('data', (data) =>  {
+        //let line = data.trim();
+        // Something is broken here ....
+        //console.log(data);
+        //console.log(String(data).trim());
+        let line = JSON.parse(String(data));
+        //console.log(line);
         let rsp = {tag: this.dataTag, line: line};
+        //console.log(rsp);
         io.emit('readLineRsp', rsp);
         io.emit('info', {readLineRsp: rsp});
         this.dataTag = null;
         this.busy = false;
+        //console.log();
       });
     });
   }
@@ -135,7 +147,8 @@ class SerialPortBridge {
   setupSocketOnWriteReadLineCb(socket) {
     socket.on('writeReadLine', (msg) => {
       let rsp = {};
-      if (!this.serialPort.isOpen()) {
+      //if (!this.serialPort.isOpen()) {
+      if (!this.serialPort.isOpen) {
         rsp = {success: false, error: 'port is not open'};
       } else if (this.busy) {
         rsp = {success: false, error: 'port is busy'};
@@ -153,7 +166,8 @@ class SerialPortBridge {
   setupSocketOnWriteLineCb(socket) {
     socket.on('writeLine', (msg) => {
       let rsp = {};
-      if (!this.serialPort.isOpen()) {
+      //if (!this.serialPort.isOpen()) {
+      if (!this.serialPort.isOpen) {
         rsp = {success: false, error: 'port is not open'};
       } else if (this.busy) {
         rsp = {success: false, error: 'port is busy'};

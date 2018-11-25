@@ -52,6 +52,9 @@
         ],
       "icon": "icons/serialport_bridge.ico"
     },
+    "mac" : {
+        "icon":"icons/icon.icns" 
+    },
     "nsis": {
         "oneClick": false
     }

@@ -20,7 +20,7 @@
     "demo"
   ],
   "devDependencies": {
-    "electron": "1.7.10",
+    "electron": "7.2.4",
     "electron-builder": "^19.52.1",
     "electron-rebuild": "^1.6.0"
   },

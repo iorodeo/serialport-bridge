@@ -1,0 +1,15 @@
+*~
+*.o
+*.swp
+*.bak
+*cache.lib
+*.pyc
+*.egg-info
+*.egg
+*.tar.gz
+__pycache__
+build
+_build
+node_modules
+node/serialport_bridge/dist
+dist

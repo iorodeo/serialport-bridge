@@ -20,7 +20,17 @@ function setupOnReady() {
 
 
 function createWindow () {
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({
+      width: 800, 
+      height: 600, 
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        enableRemoteModule: true,
+    },
+  })
+  //mainWindow.openDevTools()
+
 
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'views/index_app.html'),
@@ -45,7 +55,7 @@ function createWindow () {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     mainWindow = null

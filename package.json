@@ -6,7 +6,6 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "postinstall": "install-app-deps",
     "start": "electron .",
     "pack": "build --dir",
     "dist": "build"
@@ -20,9 +19,7 @@
     "demo"
   ],
   "devDependencies": {
-    "electron": "1.7.10",
-    "electron-builder": "^19.52.1",
-    "electron-rebuild": "^1.6.0"
+    "electron": "^31.1.0"
   },
   "dependencies": {
     "browserify-middleware": "^8.0.0",
@@ -30,7 +27,7 @@
     "ip": "^1.1.5",
     "lodash": "^4.17.4",
     "roboto-fontface": "^0.8.0",
-    "serialport": "^7.0.2",
+    "serialport": "^12.0.0",
     "socket.io": "^2.0.4",
     "vue": "^2.5.13",
     "vuetify": "^0.17.6"

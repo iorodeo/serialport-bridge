@@ -4,7 +4,8 @@ const express = require('express');
 const app = express(); 
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const SerialPort = require('serialport');
+const {SerialPort} = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline')
 const Delimiter = require('@serialport/parser-delimiter')
 
 const ip = require('ip');
@@ -71,13 +72,14 @@ class SerialPortBridge {
 
   setupSocketOnListPortsCb(socket) {
     socket.on('listPorts', async (msg) => {
-      try {
-        this.portsListCur = await this.listSerialPorts();
+      console.log('onListPorts');
+      SerialPort.list().then( list=> { 
+        this.portsListCur = list;
         this.portsListErr = '';
-      } catch (e) {
+      }).catch((e) => {
         this.portsListCur = [];
         this.portsListErr = e;
-      }
+      });
       this.sendPortsListCur(socket);
     });
   }
@@ -95,14 +97,10 @@ class SerialPortBridge {
   setupSocketOnOpenCb(socket) {
     socket.on('open', (msg) => {
       let options = { 
-        //parser: SerialPort.parsers.readline('\n'), 
+        path: msg.port,
         baudRate: msg.options.baudrate,
       }
-
-      this.serialPortInfo = {portName: msg.port};
-      Object.assign(this.serialPortInfo, options);
-
-      this.serialPort = new SerialPort(msg.port, options, (err) => {
+      this.serialPort = new SerialPort(options, (err) => {
         let rsp = {
           success: !err, 
           serialPortInfo: this.serialPortInfo,
@@ -112,23 +110,15 @@ class SerialPortBridge {
         io.emit('info', {open: {msg: msg, rsp: rsp}});
       });
 
-      const parser = this.serialPort.pipe(new Delimiter({ delimiter: '\n' }));
+      const parser = this.serialPort.pipe(new ReadlineParser());
 
       parser.on('data', (data) =>  {
-      //this.serialPort.on('data', (data) =>  {
-        //let line = data.trim();
-        // Something is broken here ....
-        //console.log(data);
-        //console.log(String(data).trim());
         let line = JSON.parse(String(data));
-        //console.log(line);
         let rsp = {tag: this.dataTag, line: line};
-        //console.log(rsp);
         io.emit('readLineRsp', rsp);
         io.emit('info', {readLineRsp: rsp});
         this.dataTag = null;
         this.busy = false;
-        //console.log();
       });
     });
   }
@@ -194,27 +184,14 @@ class SerialPortBridge {
     });
   }
 
-  listSerialPorts() {
-    let promise = new Promise(function(resolve,reject) {
-      SerialPort.list( (err,ports) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(ports);
-        }
-      });
-    });
-    return promise;
-  }
-
   getSimplifiedPortsList() { 
     let modPorts = [];
     let ttySCnt = 0;
     for (let i=0; i<this.portsListCur.length; i++) { 
 
-      if (this.portsListCur[i].comName.indexOf('ttyS') == -1) { 
+      if (this.portsListCur[i].path.indexOf('ttyS') == -1) { 
 
-        let device = this.portsListCur[i].comName; 
+        let device = this.portsListCur[i].path; 
         let manufacturer = this.portsListCur[i].manufacturer;
         let vid = this.portsListCur[i].vendorId;
         let pid = this.portsListCur[i].productId;
@@ -275,6 +252,8 @@ class SerialPortBridge {
     }
     return modPorts;
   }
+
+
 
   getClientInfo(socket) {
     let address = socket.handshake.address;

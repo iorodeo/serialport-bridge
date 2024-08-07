@@ -14,7 +14,8 @@ let serverProc
 
 function setupOnReady() {
   //createServer()
-  serverProc = cp.fork(path.join(__dirname, 'run_serialport_bridge'));
+  //serverProc = cp.fork(path.join(__dirname, 'run_serialport_bridge'));
+  serverProc = electron.utilityProcess.fork(path.join(__dirname, 'run_serialport_bridge.js'));
   createWindow()
 }
 

@@ -7,14 +7,10 @@ const app = electron.app
 const Menu = electron.Menu
 const BrowserWindow = electron.BrowserWindow
 
-//const SerialPortBridge = require('./serialport_bridge')
-
 let mainWindow
 let serverProc
 
 function setupOnReady() {
-  //createServer()
-  //serverProc = cp.fork(path.join(__dirname, 'run_serialport_bridge'));
   serverProc = electron.utilityProcess.fork(path.join(__dirname, 'run_serialport_bridge.js'));
   createWindow()
 }
@@ -30,7 +26,6 @@ function createWindow () {
         enableRemoteModule: true,
     },
   })
-  //mainWindow.openDevTools()
 
 
   mainWindow.loadURL(url.format({
@@ -56,7 +51,7 @@ function createWindow () {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -84,10 +79,7 @@ app.on('quit', function() {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  app.quit()
 })
 
 app.on('activate', function () {
